@@ -37,7 +37,12 @@ why it is necessary and where it is being used in the rest of the program.
 
 
 class Car:
-    """1. This Function:"""
+    """
+    1. This Function:
+        This function initialises the program by loading in the map and adjusting the car size to a predetermined size above, then loading them in at a specific location.
+        Much of this is to ensure that if a different sprite for the car is provided, it will still work with the size being the same and the radars coming from the centre.
+
+    """
 
     def __init__(self):
         # Load Car Sprite and Rotate
@@ -66,7 +71,7 @@ class Car:
         self.time = 0  # Time Passed
 
     """ 2. This Function:
-    
+        This renders the cars so that we can see them on a canvas-like display.
     """
 
     def draw(self, screen):
@@ -74,7 +79,8 @@ class Car:
         self.draw_radar(screen)  # OPTIONAL FOR SENSORS
 
     """ 3. This Function:
-    
+        This renders the green radars. Previous code comments have said this is optional because you may not want to see radars coming out of the cars, and instead just want to
+        see the cars moving.
     """
 
     def draw_radar(self, screen):
@@ -85,7 +91,7 @@ class Car:
             pygame.draw.circle(screen, (0, 255, 0), position, 5)
 
     """ 4. This Function:
-    
+        This function checks for collisions on the corners of the cars. If it touches the predetermined colour of the track border (in this case white), the car "dies" and stops.
     """
 
     def check_collision(self, game_map):
@@ -98,7 +104,7 @@ class Car:
                 break
 
     """ 5. This Function:
-    
+        This function determines where the radars are pointing, and then sends the information of radars (which are the input nodes).
     """
 
     def check_radar(self, degree, game_map):
@@ -131,7 +137,10 @@ class Car:
         self.radars.append([(x, y), dist])
 
     """ 6. This Function:
-    
+         This function first sets the speed if it is the first time it is run, and then it calculates and displayers the movement of the car while also making sure it doesn't
+         get too close to the edge of the screen. The four corners are also calculated which is the information needed to run the collision checking function from earlier.
+         It also calls the function that forwards the radar data to the input nodes, while specifying the shape of the radars. Modifying the angle distances between the radars,
+         tweaking the next function, and changing the config file allows for more or less input nodes which was interesting to experiment with.
     """
 
     def update(self, game_map):
@@ -189,24 +198,24 @@ class Car:
         self.radars.clear()
 
         # From -90 To 120 With Step-Size 45 Check Radar
-        for d in range(-90, 120, 45):
+        for d in range(-90, 120, 32):
             self.check_radar(d, game_map)
 
     """ 7. This Function:
-    
+    This function returns the length of each radar to their collision points.
     """
 
     def get_data(self):
         # Get Distances To Border
         radars = self.radars
-        return_values = [0, 0, 0, 0, 0]
+        return_values = [0, 0, 0, 0, 0, 0, 0]
         for i, radar in enumerate(radars):
             return_values[i] = int(radar[1] / 30)
 
         return return_values
 
     """ 8. This Function:
-    
+        Simple check for if the car is still alive
     """
 
     def is_alive(self):
@@ -214,7 +223,8 @@ class Car:
         return self.alive
 
     """ 9. This Function:
-    
+        This function calculates the reward based on the total distance the car could travel. The reason why a previous commenter added "Maybve Change?" is because this encourages
+        the car to swerve around and potentially make a U-turn in certain tracks in order to maximise distance travelled because it doesn't take into account the direction or speed.
     """
 
     def get_reward(self):
@@ -223,7 +233,7 @@ class Car:
         return self.distance / (CAR_SIZE_X / 2)
 
     """ 10. This Function:
-    
+        Rotates the car visually based on the corner calculations which take into account the turning and speed of the cars.
     """
 
     def rotate_center(self, image, angle):
@@ -237,7 +247,12 @@ class Car:
 
 
 """ This Function:
-
+    This function calls the functions needed to initiate the program, as well as specifying basic things such as the font and map. I have modified the map
+    loading function to pick a random map each time the cars either all die off or reach the time limit. This helps with cars getting stuck on a certain part of the track in
+    a particular map because sometimes they die off at a particular point and the mutations aren't enough to raise change this behaviour with that particular map. 
+    
+    The function then has the main loop where the cars move, turn, update their genes, die and get removed etc. with the functions above. It also renders the text in the middle
+    of the track to make it user-friendly and easy to see what generation the cars are on, and how many are left.
 """
 
 
@@ -263,7 +278,7 @@ def run_simulation(genomes, config):
     clock = pygame.time.Clock()
     generation_font = pygame.font.SysFont("Arial", 30)
     alive_font = pygame.font.SysFont("Arial", 20)
-    game_map = pygame.image.load("map.png").convert()  # Convert Speeds Up A Lot
+    game_map = pygame.image.load(f"map{random.randint(2, 5)}.png").convert()  # Convert Speeds Up A Lot
 
     global current_generation
     current_generation += 1
@@ -331,7 +346,8 @@ def run_simulation(genomes, config):
 
 
 """ 1. This Section:
-    
+    This sections checks if the script is being loaded by itself or as module. If it is being run directly then it loads the config file, creates a population based on this, adds
+    reporters to the population which allows us to review information about it and starts the process of running the simulation with a maximum of 1000 generations.
 """
 if __name__ == "__main__":
     # Load Config
