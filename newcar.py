@@ -198,7 +198,7 @@ class Car:
         self.radars.clear()
 
         # From -90 To 120 With Step-Size 45 Check Radar
-        for d in range(-90, 120, 32):
+        for d in range(-90, 120, 45):
             self.check_radar(d, game_map)
 
     """ 7. This Function:
@@ -208,7 +208,7 @@ class Car:
     def get_data(self):
         # Get Distances To Border
         radars = self.radars
-        return_values = [0, 0, 0, 0, 0, 0, 0]
+        return_values = [0, 0, 0, 0, 0]
         for i, radar in enumerate(radars):
             return_values[i] = int(radar[1] / 30)
 
